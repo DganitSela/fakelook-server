@@ -70,6 +70,8 @@ namespace fakeLook_starter
 
             app.UseRouting();
 
+            app.UseCors(_MyAllowSpecificOrigin);
+
             app.UseAuthorization();
 
             app.UseEndpoints(endpoints =>

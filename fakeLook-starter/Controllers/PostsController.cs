@@ -23,8 +23,7 @@ namespace fakeLook_starter.Controllers
             return new JsonResult(_repo.GetAll());
         }
 
-        [HttpGet]
-        [Route("getById")]
+        [HttpGet("{id}")]
         [ResponseType(typeof(Post))]
         public JsonResult Get(int id)
         {
@@ -32,10 +31,21 @@ namespace fakeLook_starter.Controllers
         }
 
         [HttpPost]
-        [Route("add")]
-        public async Task<Post> Add([FromBody]Post post)
+        public async Task<ActionResult<Post>> Add([FromBody] Post post)
         {
-            return  await _repo.Add(post);
+            var newPost = await _repo.Add(post);
+            return CreatedAtAction(nameof(GetAll), new { id = newPost.Id }, newPost);
+        }
+
+        [HttpPut]
+        public async Task<ActionResult> UpdatePost(int id, [FromBody] Post post)
+        {
+            if (id != post.Id)
+            {
+                return BadRequest();
+            }
+            await _repo.Edit(post);
+            return NoContent();
         }
     }
 }

@@ -1,6 +1,7 @@
 ﻿using fakeLook_models.Models;
 using fakeLook_starter.Interfaces;
 using Microsoft.AspNetCore.Mvc;
+using System.Threading.Tasks;
 
 namespace fakeLook_starter.Controllers
 {
@@ -21,17 +22,28 @@ namespace fakeLook_starter.Controllers
             return new JsonResult(_repo.GetAll());
         }
 
-        [HttpGet]
-        [Route("getById")]
+        [HttpGet("{id}")]
         public JsonResult GetUserById(int id)
         {
             return new JsonResult(_repo.GetById(id));
         }
 
         [HttpPost]
-        public JsonResult SignUp(User user)
+        public async Task<ActionResult<User>> SignUp([FromBody] User user)
         {
-            return new JsonResult(_repo.Add(user));
+            var newUser = await _repo.Add(user);
+            return CreatedAtAction(nameof(GetAll), new { id = newUser.Id }, newUser);
+        }
+
+        [HttpPut]
+        public async Task<ActionResult> UpdateUser(int id, [FromBody] User user)
+        {
+            if(id != user.Id)
+            {
+                return BadRequest();
+            }
+            await _repo.Edit(user);
+            return NoContent();
         }
     }
 }
