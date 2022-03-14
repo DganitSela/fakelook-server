@@ -19,6 +19,7 @@ namespace fakeLook_starter.Repositories
 
         public async Task<User> Add(User item)
         {
+            //item.Password = item.Password.GetHashCode().ToString();
             var res = _context.Users.Add(item);
             await _context.SaveChangesAsync();
             return res.Entity;
@@ -26,6 +27,7 @@ namespace fakeLook_starter.Repositories
 
         public async Task<User> Edit(User item)
         {
+            item.Password = item.Password.GetHashCode().ToString();
             var res = _context.Users.Update(item);
             await _context.SaveChangesAsync();
             return res.Entity;
@@ -48,7 +50,7 @@ namespace fakeLook_starter.Repositories
 
         public User GetUser(User user)
         {
-            user.Password = user.Password.GetHashCode().ToString();
+            //user.Password = user.Password.GetHashCode().ToString();
             return _context.Users.Where(u => u.UserName == user.UserName && u.Password == user.Password).SingleOrDefault();
         }
     }

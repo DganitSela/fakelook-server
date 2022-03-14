@@ -14,6 +14,11 @@ namespace fakeLook_starter.Services
     {
         private IConfiguration _config;
 
+        public TokenService(IConfiguration config)
+        {
+            _config = config;
+        }
+
         public string CreateToken(User user)
         {
             var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config["Jwt:Key"]));
