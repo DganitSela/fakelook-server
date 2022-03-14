@@ -45,5 +45,11 @@ namespace fakeLook_starter.Repositories
         {
             return _context.Users.Where(predicate).ToList();
         }
+
+        public User GetUser(User user)
+        {
+            user.Password = user.Password.GetHashCode().ToString();
+            return _context.Users.Where(u => u.UserName == user.UserName && u.Password == user.Password).SingleOrDefault();
+        }
     }
 }

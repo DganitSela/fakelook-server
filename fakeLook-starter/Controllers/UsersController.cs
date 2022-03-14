@@ -10,10 +10,12 @@ namespace fakeLook_starter.Controllers
     public class UsersController : ControllerBase
     {
         private readonly IUserRepository _repo;
+        private readonly ITokenService _tokenService;
 
-        public UsersController(IUserRepository repo)
+        public UsersController(IUserRepository repo, ITokenService tokenService)
         {
             _repo = repo;
+            _tokenService = tokenService;
         }
         
         [HttpGet]
@@ -26,6 +28,18 @@ namespace fakeLook_starter.Controllers
         public JsonResult GetUserById(int id)
         {
             return new JsonResult(_repo.GetById(id));
+        }
+
+        [HttpPost("login")]
+        public IActionResult Login([FromBody] User user)
+        {
+            var dbUser = _repo.GetUser(user);
+            if (dbUser == null)
+            {
+                return Problem("User not found.");
+            }
+            var token = _tokenService.CreateToken(dbUser);
+            return Ok(new { token });
         }
 
         [HttpPost]
