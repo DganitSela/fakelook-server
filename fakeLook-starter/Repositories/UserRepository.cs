@@ -17,20 +17,38 @@ namespace fakeLook_starter.Repositories
             _context = context;
         }
 
-        public async Task<User> Add(User item)
+    public async Task<User> Add(User item)
         {
             //item.Password = item.Password.GetHashCode().ToString();
+            if(_context.Users.SingleOrDefault(user => user.Email.Equals(item.Email)) != null)
+            {
+                throw new Exception("User with this email is already exists.");
+            }
+            else if (_context.Users.SingleOrDefault(user => user.UserName.Equals(item.UserName)) != null)
+            {
+                throw new Exception("User with this username is already exists.");
+            }
             var res = _context.Users.Add(item);
             await _context.SaveChangesAsync();
             return res.Entity;
+
         }
 
         public async Task<User> Edit(User item)
         {
             item.Password = item.Password.GetHashCode().ToString();
-            var res = _context.Users.Update(item);
-            await _context.SaveChangesAsync();
-            return res.Entity;
+            var existUser = _context.Users.Where(user => user.UserName.Equals(item.UserName)).FirstOrDefault();
+            if(existUser == null)
+            {
+                throw new Exception("User with this username doesn't exists.");
+            } else
+            {
+                existUser.Password = item.Password;
+                var res = _context.Users.Update(existUser);
+                await _context.SaveChangesAsync();
+                return res.Entity;
+            }
+            
         }
 
         public ICollection<User> GetAll()
