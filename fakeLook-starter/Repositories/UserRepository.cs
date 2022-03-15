@@ -36,7 +36,7 @@ namespace fakeLook_starter.Repositories
 
         public async Task<User> Edit(User item)
         {
-            item.Password = item.Password.GetHashCode().ToString();
+            //item.Password = item.Password.GetHashCode().ToString();
             var existUser = _context.Users.Where(user => user.UserName.Equals(item.UserName)).FirstOrDefault();
             if(existUser == null)
             {

@@ -22,4 +22,9 @@ namespace fakeLook_starter.Interfaces
     {
 
     }
+
+    public interface ICommentsRepository : IRepository<Comment>
+    {
+        public ICollection<Comment> GetAllByPostId(int postId);
+    }
 }
