@@ -45,7 +45,7 @@ namespace fakeLook_starter.Controllers
             var user = obj as User;
             post.UserId = user.Id;
             var newPost = await _repo.Add(post);
-            return CreatedAtAction(nameof(Add), new { id = newPost.Id }, new Post() { Id = newPost.Id});
+            return CreatedAtAction(nameof(Add), new { id = newPost.Id }, newPost);
         }
 
         [HttpPut]
