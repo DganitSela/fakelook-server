@@ -1,11 +1,13 @@
 ﻿using fakeLook_models.Models;
 using fakeLook_starter.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Threading.Tasks;
 using System.Web.Http.Description;
 
 namespace fakeLook_starter.Controllers
 {
+    [Authorize]
     [ApiController]
     [Route("[controller]")]
     public class PostsController : ControllerBase

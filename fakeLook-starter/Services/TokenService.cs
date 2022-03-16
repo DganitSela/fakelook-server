@@ -25,6 +25,7 @@ namespace fakeLook_starter.Services
             var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
             var claims = new[] {
             new Claim(ClaimTypes.Name, user.Id.ToString()),
+            //new Claim("User", ),
             //new Claim(ClaimTypes.Role, user.Role),
             //new Claim(ClaimTypes.NameIdentifier,
             //Guid.NewGuid().ToString())

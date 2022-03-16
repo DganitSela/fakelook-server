@@ -37,6 +37,8 @@ namespace fakeLook_starter
             services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
               .AddJwtBearer(options =>
               {
+                  options.RequireHttpsMetadata = false;
+                  options.SaveToken = true;
                   options.TokenValidationParameters = new TokenValidationParameters
                   {
                       ValidateIssuer = true,
@@ -91,6 +93,8 @@ namespace fakeLook_starter
             app.UseRouting();
 
             app.UseCors(_MyAllowSpecificOrigin);
+
+            app.UseAuthentication();
 
             app.UseAuthorization();
 
