@@ -24,7 +24,7 @@ namespace fakeLook_starter.Services
             var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config["Jwt:Key"]));
             var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
             var claims = new[] {
-            new Claim(ClaimTypes.Name, user.Id.ToString()),
+            new Claim("UserId", user.Id.ToString()),
             //new Claim("User", ),
             //new Claim(ClaimTypes.Role, user.Role),
             //new Claim(ClaimTypes.NameIdentifier,
@@ -42,7 +42,7 @@ namespace fakeLook_starter.Services
         public string GetPayload(string token)
         {
             var tokenHandler = new JwtSecurityTokenHandler();
-            return tokenHandler.ReadJwtToken(token).Claims.Where(claim => claim.Type == ClaimTypes.Name).Single().Value;
+            return tokenHandler.ReadJwtToken(token).Claims.Where(claim => claim.Type == "UserId").Single().Value;
         }
     }
 }

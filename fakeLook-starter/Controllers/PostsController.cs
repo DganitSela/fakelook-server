@@ -1,4 +1,5 @@
 ﻿using fakeLook_models.Models;
+using fakeLook_starter.Filters;
 using fakeLook_starter.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -7,7 +8,6 @@ using System.Web.Http.Description;
 
 namespace fakeLook_starter.Controllers
 {
-    [Authorize]
     [ApiController]
     [Route("[controller]")]
     public class PostsController : ControllerBase
@@ -20,6 +20,8 @@ namespace fakeLook_starter.Controllers
         }
 
         [HttpGet]
+        [TypeFilter(typeof(GetUserActionFilter))]
+        [Authorize]
         public JsonResult GetAll()
         {
             return new JsonResult(_repo.GetAll());
@@ -27,19 +29,28 @@ namespace fakeLook_starter.Controllers
 
         [HttpGet("{id}")]
         [ResponseType(typeof(Post))]
+        [TypeFilter(typeof(GetUserActionFilter))]
+        [Authorize]
         public JsonResult Get(int id)
         {
             return new JsonResult(_repo.GetById(id));
         }
 
         [HttpPost]
+        [TypeFilter(typeof(GetUserActionFilter))]
+        [Authorize]
         public async Task<ActionResult<Post>> Add([FromBody] Post post)
         {
+            Request.RouteValues.TryGetValue("user", out var obj);
+            var user = obj as User;
+            post.UserId = user.Id;
             var newPost = await _repo.Add(post);
-            return CreatedAtAction(nameof(GetAll), new { id = newPost.Id }, newPost);
+            return CreatedAtAction(nameof(Add), new { id = newPost.Id }, newPost);
         }
 
         [HttpPut]
+        [TypeFilter(typeof(GetUserActionFilter))]
+        [Authorize]
         public async Task<ActionResult> UpdatePost(int id, [FromBody] Post post)
         {
             if (id != post.Id)
