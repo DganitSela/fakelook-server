@@ -27,4 +27,14 @@ namespace fakeLook_starter.Interfaces
     {
         public ICollection<Comment> GetAllByPostId(int postId);
     }
+
+    public interface ILikesRepository : IRepository<Like>
+    {
+        public ICollection<Like> GetAllByPostId(int postId);
+    }
+
+    public interface ITagsRepository : IRepository<Tag>
+    {
+
+    }
 }

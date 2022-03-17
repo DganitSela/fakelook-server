@@ -1,6 +1,7 @@
 ﻿using fakeLook_dal.Data;
 using fakeLook_models.Models;
 using fakeLook_starter.Interfaces;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -32,7 +33,7 @@ namespace fakeLook_starter.Repositories
 
         public ICollection<Post> GetAll()
         {
-            return _context.Posts.ToList();
+            return _context.Posts.Include(p => p.Comments).Include(p => p.Likes).ToList();
         }
 
         public Post GetById(int id)
