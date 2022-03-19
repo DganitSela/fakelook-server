@@ -1,5 +1,6 @@
 ﻿using fakeLook_dal.Data;
 using fakeLook_models.Models;
+using fakeLook_starter.Controllers;
 using fakeLook_starter.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -19,7 +20,19 @@ namespace fakeLook_starter.Repositories
 
         public async Task<Post> Add(Post item)
         {
+            List<Tag> tags = new List<Tag>();
+            if (item.Tags != null)
+            {
+                tags = item.Tags.ToList();
+                item.Tags.Clear();
+            }
+            
             var res = _context.Posts.Add(item);
+            await _context.SaveChangesAsync();
+            foreach (var tag in tags)
+            {
+                res.Entity.Tags.Add(tag);
+            }
             await _context.SaveChangesAsync();
             return res.Entity;
         }
@@ -33,7 +46,13 @@ namespace fakeLook_starter.Repositories
 
         public ICollection<Post> GetAll()
         {
-            return _context.Posts.Include(p => p.Comments).Include(p => p.Likes).ToList();
+            return _context.Posts.Include(p => p.Comments).Include(p => p.Likes).OrderByDescending(p => p.Date).ToList();
+        }
+
+        public ICollection<Post> GetAll(PostParameters postParameters)
+        {
+            //var posts;
+            return _context.Posts.Where(p => p.Date <= postParameters.MaxDate && p.Date >= postParameters.MinDate).OrderByDescending(p => p.Date).ToList();
         }
 
         public Post GetById(int id)

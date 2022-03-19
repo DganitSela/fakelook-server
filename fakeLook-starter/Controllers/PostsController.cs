@@ -3,6 +3,7 @@ using fakeLook_starter.Filters;
 using fakeLook_starter.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System;
 using System.Threading.Tasks;
 using System.Web.Http.Description;
 
@@ -25,6 +26,18 @@ namespace fakeLook_starter.Controllers
         public JsonResult GetAll()
         {
             return new JsonResult(_repo.GetAll());
+        }
+
+        [HttpGet("filter")]
+        [TypeFilter(typeof(GetUserActionFilter))]
+        [Authorize]
+        public IActionResult GetAll([FromQuery] PostParameters postParameters)
+        {
+            if (!postParameters.ValidDateRange)
+            {
+                return BadRequest("Date range not valid.");
+            }
+            return new JsonResult(_repo.GetAll(postParameters));
         }
 
         [HttpGet("{id}")]
@@ -60,5 +73,13 @@ namespace fakeLook_starter.Controllers
             await _repo.Edit(post);
             return NoContent();
         }
+    }
+
+    public class PostParameters
+    {
+        public DateTime MinDate { get; set; } = DateTime.MinValue;
+        public DateTime MaxDate { get; set; } = DateTime.Now;
+
+        public bool ValidDateRange => MaxDate > MinDate;
     }
 }

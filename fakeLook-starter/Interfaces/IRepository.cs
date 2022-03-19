@@ -1,4 +1,5 @@
 ﻿using fakeLook_models.Models;
+using fakeLook_starter.Controllers;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -20,7 +21,7 @@ namespace fakeLook_starter.Interfaces
     }
     public interface IPostRepository : IRepository<Post>
     {
-
+        public ICollection<Post> GetAll(PostParameters postParameters);
     }
 
     public interface ICommentsRepository : IRepository<Comment>
