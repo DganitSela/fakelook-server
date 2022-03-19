@@ -13,6 +13,7 @@ namespace fakeLook_starter.Repositories
     public class PostRepository : IPostRepository
     {
         readonly private DataContext _context;
+
         public PostRepository(DataContext context)
         {
             _context = context;
@@ -31,7 +32,15 @@ namespace fakeLook_starter.Repositories
             await _context.SaveChangesAsync();
             foreach (var tag in tags)
             {
-                res.Entity.Tags.Add(tag);
+                var postTag = _context.Tags.Where(t => t.Content.Equals(tag.Content)).FirstOrDefault();
+                if (postTag != null)
+                {
+                    res.Entity.Tags.Add(postTag);
+                }
+                else
+                {
+                    res.Entity.Tags.Add(tag);
+                }   
             }
             await _context.SaveChangesAsync();
             return res.Entity;
