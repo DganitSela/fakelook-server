@@ -22,10 +22,16 @@ namespace fakeLook_starter.Repositories
         public async Task<Post> Add(Post item)
         {
             List<Tag> tags = new List<Tag>();
+            List<UserTaggedPost> userTaggedPosts = new List<UserTaggedPost>();
             if (item.Tags != null)
             {
                 tags = item.Tags.ToList();
                 item.Tags.Clear();
+            }
+            if(item.UserTaggedPost != null)
+            {
+                userTaggedPosts = item.UserTaggedPost.ToList();
+                item.UserTaggedPost.Clear();
             }
             
             var res = _context.Posts.Add(item);
@@ -41,6 +47,13 @@ namespace fakeLook_starter.Repositories
                 {
                     res.Entity.Tags.Add(tag);
                 }   
+            }
+            foreach(var userTaggedPost in userTaggedPosts)
+            {
+                if(_context.Users.Where(u => u.Id == userTaggedPost.Id).FirstOrDefault() != null)
+                {
+                    res.Entity.UserTaggedPost.Add(userTaggedPost);
+                }
             }
             await _context.SaveChangesAsync();
             return res.Entity;
