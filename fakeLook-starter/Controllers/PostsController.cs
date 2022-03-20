@@ -4,6 +4,7 @@ using fakeLook_starter.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using System.Web.Http.Description;
 
@@ -79,6 +80,8 @@ namespace fakeLook_starter.Controllers
     {
         public DateTime MinDate { get; set; } = DateTime.MinValue;
         public DateTime MaxDate { get; set; } = DateTime.Now;
+
+        public List<int> Publishers { get; set; } = new List<int>();
 
         public bool ValidDateRange => MaxDate > MinDate;
     }

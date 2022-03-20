@@ -32,6 +32,9 @@ namespace fakeLook_starter.Controllers
         [HttpPost]
         public async Task<ActionResult<Comment>> Add([FromBody] Comment comment)
         {
+            Request.RouteValues.TryGetValue("user", out var obj);
+            var user = obj as User;
+            comment.UserId = user.Id;
             var newComment = await _repo.Add(comment);
             return CreatedAtAction(nameof(GetAll), new { id = newComment.Id }, newComment);
         }

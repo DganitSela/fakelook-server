@@ -33,7 +33,6 @@ namespace fakeLook_starter.Repositories
                 userTaggedPosts = item.UserTaggedPost.ToList();
                 item.UserTaggedPost.Clear();
             }
-            
             var res = _context.Posts.Add(item);
             await _context.SaveChangesAsync();
             foreach (var tag in tags)
@@ -50,7 +49,7 @@ namespace fakeLook_starter.Repositories
             }
             foreach(var userTaggedPost in userTaggedPosts)
             {
-                if(_context.Users.Where(u => u.Id == userTaggedPost.Id).FirstOrDefault() != null)
+                if(_context.Users.Where(u => u.Id == userTaggedPost.UserId).FirstOrDefault() != null)
                 {
                     res.Entity.UserTaggedPost.Add(userTaggedPost);
                 }
@@ -73,8 +72,28 @@ namespace fakeLook_starter.Repositories
 
         public ICollection<Post> GetAll(PostParameters postParameters)
         {
-            //var posts;
-            return _context.Posts.Where(p => p.Date <= postParameters.MaxDate && p.Date >= postParameters.MinDate).OrderByDescending(p => p.Date).ToList();
+            //var posts = _context.Posts.OrderByDescending(p => p.Date).ToList();
+            //var filteredPosts = posts;
+            //if (postParameters.MinDate > DateTime.MinValue || postParameters.MaxDate < DateTime.Now)
+            //{
+            //    filteredPosts = this.GetByPredicate(p => p.Date >= postParameters.MinDate && p.Date <= postParameters.MaxDate).ToList();
+            //}
+            //if (postParameters.Publishers.Count() > 0)
+            //{
+            //    ICollection<Post> publishersFilteredPosts;
+            //    foreach(var i in postParameters.Publishers)
+            //    {
+            //        publishersFilteredPosts = publishersFilteredPosts.Union(this.GetByPredicate(p => p.UserId == i).ToList());
+            //    }
+            //}
+            //return posts;
+            //return _context.Posts.Where(p => p.Date <= postParameters.MaxDate && p.Date >= postParameters.MinDate).OrderByDescending(p => p.Date).ToList();
+            return this.GetByPredicate(p =>
+            {
+                bool date = p.Date <= postParameters.MaxDate && p.Date >= postParameters.MinDate;
+                bool publishers = postParameters.Publishers.Count() > 0 ? postParameters.Publishers.Contains(p.UserId) : true;
+                return date && publishers;
+            });
         }
 
         public Post GetById(int id)
