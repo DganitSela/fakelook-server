@@ -13,54 +13,42 @@ namespace fakeLook_starter.Repositories
     public class PostRepository : IPostRepository
     {
         readonly private DataContext _context;
+        readonly private ITagsRepository _tagsRepository;
 
-        public PostRepository(DataContext context)
+        public PostRepository(DataContext context, ITagsRepository tagsRepository)
         {
             _context = context;
+            _tagsRepository = tagsRepository;
         }
 
         public async Task<Post> Add(Post item)
         {
-            List<Tag> tags = new List<Tag>();
-            List<UserTaggedPost> userTaggedPosts = new List<UserTaggedPost>();
-            if (item.Tags != null)
+            ICollection<Tag> tags = new List<Tag>();
+            for(int i = 0; i < item.Tags.Count; i++)
             {
-                tags = item.Tags.ToList();
-                item.Tags.Clear();
+                tags.Add(await _tagsRepository.Add(item.Tags.ElementAt(i)));
             }
-            if(item.UserTaggedPost != null)
-            {
-                userTaggedPosts = item.UserTaggedPost.ToList();
-                item.UserTaggedPost.Clear();
-            }
+            item.Tags = tags;
             var res = _context.Posts.Add(item);
-            await _context.SaveChangesAsync();
-            foreach (var tag in tags)
-            {
-                var postTag = _context.Tags.Where(t => t.Content.Equals(tag.Content)).FirstOrDefault();
-                if (postTag != null)
-                {
-                    res.Entity.Tags.Add(postTag);
-                }
-                else
-                {
-                    res.Entity.Tags.Add(tag);
-                }   
-            }
-            foreach(var userTaggedPost in userTaggedPosts)
-            {
-                if(_context.Users.Where(u => u.Id == userTaggedPost.UserId).FirstOrDefault() != null)
-                {
-                    res.Entity.UserTaggedPost.Add(userTaggedPost);
-                }
-            }
             await _context.SaveChangesAsync();
             return res.Entity;
         }
 
         public async Task<Post> Edit(Post item)
         {
-            var res = _context.Posts.Update(item);
+            ICollection<Tag> tags = new List<Tag>();
+            var existPost = _context.Posts.Where(post => post.Id == item.Id).Include(post => post.Tags).FirstOrDefault();
+            if(existPost == null)
+            {
+                throw new Exception("Post with this id doesn't exists.");
+            }
+            for (int i = 0; i < item.Tags.Count; i++)
+            {
+                tags.Add(await _tagsRepository.Add(item.Tags.ElementAt(i)));
+            }
+            existPost.Description = item.Description;
+            existPost.Tags = tags;
+            var res = _context.Posts.Update(existPost);
             await _context.SaveChangesAsync();
             return res.Entity;
         }
@@ -72,27 +60,13 @@ namespace fakeLook_starter.Repositories
 
         public ICollection<Post> GetAll(PostParameters postParameters)
         {
-            //var posts = _context.Posts.OrderByDescending(p => p.Date).ToList();
-            //var filteredPosts = posts;
-            //if (postParameters.MinDate > DateTime.MinValue || postParameters.MaxDate < DateTime.Now)
-            //{
-            //    filteredPosts = this.GetByPredicate(p => p.Date >= postParameters.MinDate && p.Date <= postParameters.MaxDate).ToList();
-            //}
-            //if (postParameters.Publishers.Count() > 0)
-            //{
-            //    ICollection<Post> publishersFilteredPosts;
-            //    foreach(var i in postParameters.Publishers)
-            //    {
-            //        publishersFilteredPosts = publishersFilteredPosts.Union(this.GetByPredicate(p => p.UserId == i).ToList());
-            //    }
-            //}
-            //return posts;
-            //return _context.Posts.Where(p => p.Date <= postParameters.MaxDate && p.Date >= postParameters.MinDate).OrderByDescending(p => p.Date).ToList();
-            return this.GetByPredicate(p =>
+            return GetByPredicate(p =>
             {
                 bool date = p.Date <= postParameters.MaxDate && p.Date >= postParameters.MinDate;
                 bool publishers = postParameters.Publishers.Count() > 0 ? postParameters.Publishers.Contains(p.UserId) : true;
-                return date && publishers;
+                bool tags = postParameters.Tags.Count() > 0 ? CheckIfContainsTag(p, postParameters.Tags) : true;
+                bool taggedUsers = postParameters.TaggedUsers.Count() > 0 ? CheckIfContainsTaggedUser(p, postParameters.TaggedUsers) : true;
+                return date && publishers && tags && taggedUsers;
             });
         }
 
@@ -103,7 +77,31 @@ namespace fakeLook_starter.Repositories
 
         public ICollection<Post> GetByPredicate(Func<Post,bool> predicate)
         {
-            return _context.Posts.Where(predicate).ToList();
+            return _context.Posts.Include(p => p.Tags).Include(p => p.UserTaggedPost).Where(predicate).ToList();
+        }
+
+        private bool CheckIfContainsTag(Post post, List<string> tags)
+        {
+            foreach(var tag in post.Tags)
+            {
+                if (tags.Contains(tag.Content))
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        private bool CheckIfContainsTaggedUser(Post post, List<int> taggedUsers)
+        {
+            foreach(var taggedUser in post.UserTaggedPost)
+            {
+                if (taggedUsers.Contains(taggedUser.UserId))
+                {
+                    return true;
+                }
+            }
+            return false;
         }
     }
 }

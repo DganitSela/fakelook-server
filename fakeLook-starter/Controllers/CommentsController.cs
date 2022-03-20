@@ -1,4 +1,5 @@
 ﻿using fakeLook_models.Models;
+using fakeLook_starter.Filters;
 using fakeLook_starter.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -30,6 +31,8 @@ namespace fakeLook_starter.Controllers
         }
 
         [HttpPost]
+        [TypeFilter(typeof(GetUserActionFilter))]
+        [Authorize]
         public async Task<ActionResult<Comment>> Add([FromBody] Comment comment)
         {
             Request.RouteValues.TryGetValue("user", out var obj);

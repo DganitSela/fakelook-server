@@ -18,9 +18,14 @@ namespace fakeLook_starter.Repositories
 
         public async Task<Tag> Add(Tag item)
         {
-            var res = _context.Tags.Add(item);
-            await _context.SaveChangesAsync();
-            return res.Entity;
+            var tag = _context.Tags.SingleOrDefault(t => t.Content.Equals(item.Content));
+            if(tag == null)
+            {
+                var res = _context.Tags.Add(item);
+                await _context.SaveChangesAsync();
+                return res.Entity;
+            }
+            return tag;
         }
 
         public async Task<Tag> Edit(Tag item)

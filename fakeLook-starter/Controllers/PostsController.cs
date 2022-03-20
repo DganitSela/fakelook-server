@@ -62,14 +62,19 @@ namespace fakeLook_starter.Controllers
             return CreatedAtAction(nameof(Add), new { id = newPost.Id }, newPost);
         }
 
-        [HttpPut]
+        [HttpPatch("{id}")]
         [TypeFilter(typeof(GetUserActionFilter))]
         [Authorize]
         public async Task<ActionResult> UpdatePost(int id, [FromBody] Post post)
         {
+            Request.RouteValues.TryGetValue("user", out var obj);
+            var user = obj as User;
             if (id != post.Id)
             {
                 return BadRequest();
+            } else if(user.Id != post.UserId)
+            {
+                return BadRequest("You don't have permissions to edit this post.");
             }
             await _repo.Edit(post);
             return NoContent();
@@ -82,6 +87,10 @@ namespace fakeLook_starter.Controllers
         public DateTime MaxDate { get; set; } = DateTime.Now;
 
         public List<int> Publishers { get; set; } = new List<int>();
+
+        public List<string> Tags { get; set; } = new List<string>();
+
+        public List<int> TaggedUsers { get; set; } = new List<int>();
 
         public bool ValidDateRange => MaxDate > MinDate;
     }
