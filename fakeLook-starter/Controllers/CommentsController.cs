@@ -3,6 +3,7 @@ using fakeLook_starter.Filters;
 using fakeLook_starter.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System;
 using System.Threading.Tasks;
 
 namespace fakeLook_starter.Controllers
@@ -19,12 +20,16 @@ namespace fakeLook_starter.Controllers
         }
 
         [HttpGet]
+        [TypeFilter(typeof(GetUserActionFilter))]
+        [Authorize]
         public JsonResult GetAll()
         {
             return new JsonResult(_repo.GetAll());
         }
 
         [HttpGet("post/{id}")]
+        [TypeFilter(typeof(GetUserActionFilter))]
+        [Authorize]
         public JsonResult GetAllCommentsByPostId(int id)
         {
             return new JsonResult(_repo.GetAllByPostId(id));
@@ -38,11 +43,20 @@ namespace fakeLook_starter.Controllers
             Request.RouteValues.TryGetValue("user", out var obj);
             var user = obj as User;
             comment.UserId = user.Id;
-            var newComment = await _repo.Add(comment);
-            return CreatedAtAction(nameof(GetAll), new { id = newComment.Id }, newComment);
+            try
+            {
+                var newComment = await _repo.Add(comment);
+                return CreatedAtAction(nameof(GetAll), new { id = newComment.Id }, newComment);
+            } catch(Exception e)
+            {
+                return BadRequest(e.Message);
+            }
+            
         }
 
         [HttpPut]
+        [TypeFilter(typeof(GetUserActionFilter))]
+        [Authorize]
         public async Task<ActionResult> UpdateComment(int id, [FromBody] Comment comment)
         {
             if (id != comment.Id)
