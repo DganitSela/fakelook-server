@@ -38,4 +38,9 @@ namespace fakeLook_starter.Interfaces
     {
 
     }
+
+    public interface IUserTaggedPostRepository : IRepository<UserTaggedPost>
+    {
+        public void Delete(int id);
+    }
 }

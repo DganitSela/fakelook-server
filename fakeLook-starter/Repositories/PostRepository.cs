@@ -14,11 +14,13 @@ namespace fakeLook_starter.Repositories
     {
         readonly private DataContext _context;
         readonly private ITagsRepository _tagsRepository;
+        readonly private IUserTaggedPostRepository _userTaggedPostRepository;
 
-        public PostRepository(DataContext context, ITagsRepository tagsRepository)
+        public PostRepository(DataContext context, ITagsRepository tagsRepository, IUserTaggedPostRepository userTaggedPostRepository)
         {
             _context = context;
             _tagsRepository = tagsRepository;
+            _userTaggedPostRepository = userTaggedPostRepository;
         }
 
         public async Task<Post> Add(Post item)
@@ -37,7 +39,7 @@ namespace fakeLook_starter.Repositories
         public async Task<Post> Edit(Post item)
         {
             ICollection<Tag> tags = new List<Tag>();
-            var existPost = _context.Posts.Where(post => post.Id == item.Id).Include(post => post.Tags).FirstOrDefault();
+            var existPost = _context.Posts.Where(post => post.Id == item.Id).Include(post => post.Tags).Include(p => p.UserTaggedPost).FirstOrDefault();
             if(existPost == null)
             {
                 throw new Exception("Post with this id doesn't exists.");
@@ -48,6 +50,11 @@ namespace fakeLook_starter.Repositories
             }
             existPost.Description = item.Description;
             existPost.Tags = tags;
+            foreach(var userTaggedPost in existPost.UserTaggedPost)
+            {
+                _userTaggedPostRepository.Delete(userTaggedPost.Id);
+            }
+            existPost.UserTaggedPost = item.UserTaggedPost;
             var res = _context.Posts.Update(existPost);
             await _context.SaveChangesAsync();
             return res.Entity;
@@ -72,7 +79,7 @@ namespace fakeLook_starter.Repositories
 
         public Post GetById(int id)
         {
-            return _context.Posts.SingleOrDefault(p => p.Id == id);
+            return _context.Posts.Where(post => post.Id == id).Include(post => post.Tags).FirstOrDefault();
         }
 
         public ICollection<Post> GetByPredicate(Func<Post,bool> predicate)
