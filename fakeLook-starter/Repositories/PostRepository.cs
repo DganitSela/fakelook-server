@@ -62,7 +62,7 @@ namespace fakeLook_starter.Repositories
         {
             return GetByPredicate(p =>
             {
-                bool date = p.Date <= postParameters.MaxDate && p.Date >= postParameters.MinDate;
+                bool date = p.Date.Date <= postParameters.MaxDate && p.Date.Date >= postParameters.MinDate;
                 bool publishers = postParameters.Publishers.Count() > 0 ? postParameters.Publishers.Contains(p.UserId) : true;
                 bool tags = postParameters.Tags.Count() > 0 ? CheckIfContainsTag(p, postParameters.Tags) : true;
                 bool taggedUsers = postParameters.TaggedUsers.Count() > 0 ? CheckIfContainsTaggedUser(p, postParameters.TaggedUsers) : true;
@@ -77,7 +77,7 @@ namespace fakeLook_starter.Repositories
 
         public ICollection<Post> GetByPredicate(Func<Post,bool> predicate)
         {
-            return _context.Posts.Include(p => p.Tags).Include(p => p.UserTaggedPost).Where(predicate).ToList();
+            return _context.Posts.Include(p => p.Tags).Include(p => p.UserTaggedPost).Where(predicate).OrderByDescending(p => p.Date).ToList();
         }
 
         private bool CheckIfContainsTag(Post post, List<string> tags)

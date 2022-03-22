@@ -92,6 +92,6 @@ namespace fakeLook_starter.Controllers
 
         public List<int> TaggedUsers { get; set; } = new List<int>();
 
-        public bool ValidDateRange => MaxDate > MinDate;
+        public bool ValidDateRange => MaxDate >= MinDate;
     }
 }
