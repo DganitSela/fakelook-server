@@ -55,7 +55,7 @@ namespace fakeLook_starter.Repositories
 
         public ICollection<Comment> GetAll()
         {
-            return _context.Comments.Include(c => c.User).ToList();
+            return _context.Comments.Include(c => c.User).Include(c => c.Tags).Include(c => c.UserTaggedComment).ToList();
         }
 
         public ICollection<Comment> GetAllByPostId(int postId)
