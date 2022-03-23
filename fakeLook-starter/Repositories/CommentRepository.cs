@@ -55,12 +55,12 @@ namespace fakeLook_starter.Repositories
 
         public ICollection<Comment> GetAll()
         {
-            return _context.Comments.Include(c => c.User).Include(c => c.Tags).Include(c => c.UserTaggedComment).ToList();
+            return _context.Comments.Include(c => c.Tags).Include(c => c.UserTaggedComment).ToList();
         }
 
         public ICollection<Comment> GetAllByPostId(int postId)
         {
-            return _context.Comments.Where(c => c.PostId == postId).Include(c => c.User).ToList();
+            return _context.Comments.Where(c => c.PostId == postId).Include(c => c.Tags).Include(c => c.UserTaggedComment).ToList();
         }
 
         public Comment GetById(int id)
