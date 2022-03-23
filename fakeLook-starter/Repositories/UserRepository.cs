@@ -71,5 +71,16 @@ namespace fakeLook_starter.Repositories
             //user.Password = user.Password.GetHashCode().ToString();
             return _context.Users.Where(u => u.UserName == user.UserName && u.Password == user.Password).SingleOrDefault();
         }
+
+        public Dictionary<int, string> GetUserNames()
+        {
+            Dictionary<int, string> usersDictionary = new Dictionary<int, string>();
+            var users = GetAll();
+            foreach (var user in users)
+            {
+                usersDictionary.Add(user.Id, user.UserName);
+            }
+            return usersDictionary;
+        }
     }
 }

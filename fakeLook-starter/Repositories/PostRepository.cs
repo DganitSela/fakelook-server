@@ -38,23 +38,29 @@ namespace fakeLook_starter.Repositories
 
         public async Task<Post> Edit(Post item)
         {
-            ICollection<Tag> tags = new List<Tag>();
             var existPost = _context.Posts.Where(post => post.Id == item.Id).Include(post => post.Tags).Include(p => p.UserTaggedPost).FirstOrDefault();
             if(existPost == null)
             {
                 throw new Exception("Post with this id doesn't exists.");
             }
-            for (int i = 0; i < item.Tags.Count; i++)
+            if(item.Tags != null)
             {
-                tags.Add(await _tagsRepository.Add(item.Tags.ElementAt(i)));
+                ICollection<Tag> tags = new List<Tag>();
+                for (int i = 0; i < item.Tags.Count; i++)
+                {
+                    tags.Add(await _tagsRepository.Add(item.Tags.ElementAt(i)));
+                }
+                existPost.Tags = tags;
             }
             existPost.Description = item.Description;
-            existPost.Tags = tags;
             foreach(var userTaggedPost in existPost.UserTaggedPost)
             {
                 _userTaggedPostRepository.Delete(userTaggedPost.Id);
             }
-            existPost.UserTaggedPost = item.UserTaggedPost;
+            if(item.UserTaggedPost != null)
+            {
+                existPost.UserTaggedPost = item.UserTaggedPost;
+            }
             var res = _context.Posts.Update(existPost);
             await _context.SaveChangesAsync();
             return res.Entity;
@@ -62,7 +68,7 @@ namespace fakeLook_starter.Repositories
 
         public ICollection<Post> GetAll()
         {
-            return _context.Posts.Include(p => p.Comments).Include(p => p.Likes).OrderByDescending(p => p.Date).ToList();
+            return _context.Posts.Include(p => p.Comments).Include(p => p.Likes).Include(p => p.Tags).Include(p => p.UserTaggedPost).OrderByDescending(p => p.Date).ToList();
         }
 
         public ICollection<Post> GetAll(PostParameters postParameters)
@@ -79,12 +85,12 @@ namespace fakeLook_starter.Repositories
 
         public Post GetById(int id)
         {
-            return _context.Posts.Where(post => post.Id == id).Include(post => post.Tags).FirstOrDefault();
+            return _context.Posts.Where(post => post.Id == id).Include(p => p.Comments).Include(p => p.Likes).Include(p => p.Tags).Include(p => p.UserTaggedPost).FirstOrDefault();
         }
 
         public ICollection<Post> GetByPredicate(Func<Post,bool> predicate)
         {
-            return _context.Posts.Include(p => p.Tags).Include(p => p.UserTaggedPost).Where(predicate).OrderByDescending(p => p.Date).ToList();
+            return _context.Posts.Include(p => p.Comments).Include(p => p.Likes).Include(p => p.Tags).Include(p => p.UserTaggedPost).Where(predicate).OrderByDescending(p => p.Date).ToList();
         }
 
         private bool CheckIfContainsTag(Post post, List<string> tags)

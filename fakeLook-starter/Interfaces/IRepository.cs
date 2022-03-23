@@ -18,6 +18,7 @@ namespace fakeLook_starter.Interfaces
     public interface IUserRepository : IRepository<User>
     {
         public User GetUser(User user);
+        public Dictionary<int, string> GetUserNames();
     }
     public interface IPostRepository : IRepository<Post>
     {

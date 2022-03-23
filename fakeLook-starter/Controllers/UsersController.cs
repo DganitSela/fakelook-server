@@ -69,5 +69,11 @@ namespace fakeLook_starter.Controllers
             }
             return NoContent();
         }
+
+        [HttpGet("usernames")]
+        public JsonResult GetAllUserNames()
+        {
+            return new JsonResult(_repo.GetUserNames());
+        }
     }
 }
