@@ -53,6 +53,7 @@ namespace fakeLook_starter.Repositories
                 existPost.Tags = tags;
             }
             existPost.Description = item.Description;
+            existPost.ImageSorce = item.ImageSorce;
             foreach(var userTaggedPost in existPost.UserTaggedPost)
             {
                 _userTaggedPostRepository.Delete(userTaggedPost.Id);
@@ -93,6 +94,8 @@ namespace fakeLook_starter.Repositories
             return _context.Posts.Include(p => p.Comments).Include(p => p.Likes).Include(p => p.Tags).Include(p => p.UserTaggedPost).Where(predicate).OrderByDescending(p => p.Date).ToList();
         }
 
+        // Function that gets post and list of tags and check if the list contains one of the tags
+        // that tagged in the post.
         private bool CheckIfContainsTag(Post post, List<string> tags)
         {
             foreach(var tag in post.Tags)
@@ -105,6 +108,8 @@ namespace fakeLook_starter.Repositories
             return false;
         }
 
+        // Function that gets post and list of users id and check if the list contains one of the
+        // users that tagged in the post.
         private bool CheckIfContainsTaggedUser(Post post, List<int> taggedUsers)
         {
             foreach(var taggedUser in post.UserTaggedPost)
