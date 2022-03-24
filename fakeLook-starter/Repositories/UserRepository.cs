@@ -19,6 +19,7 @@ namespace fakeLook_starter.Repositories
 
     public async Task<User> Add(User item)
         {
+            // TODO: get better hashcode algorithm for encrypted password
             //item.Password = item.Password.GetHashCode().ToString();
             if(_context.Users.SingleOrDefault(user => user.Email.Equals(item.Email)) != null)
             {
@@ -36,6 +37,7 @@ namespace fakeLook_starter.Repositories
 
         public async Task<User> Edit(User item)
         {
+            // TODO: get better hashcode algorithm for encrypted password
             //item.Password = item.Password.GetHashCode().ToString();
             var existUser = _context.Users.Where(user => user.UserName.Equals(item.UserName)).FirstOrDefault();
             if(existUser == null)
@@ -68,10 +70,12 @@ namespace fakeLook_starter.Repositories
 
         public User GetUser(User user)
         {
+            // TODO: get better hashcode algorithm for encrypted password
             //user.Password = user.Password.GetHashCode().ToString();
             return _context.Users.Where(u => u.UserName == user.UserName && u.Password == user.Password).SingleOrDefault();
         }
 
+        // Function that creates and returns a dictionary with pair of user id and user names.
         public Dictionary<int, string> GetUserNames()
         {
             Dictionary<int, string> usersDictionary = new Dictionary<int, string>();

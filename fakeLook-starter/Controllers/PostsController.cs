@@ -81,6 +81,7 @@ namespace fakeLook_starter.Controllers
         }
     }
 
+    // Class that holds a filter parameters with default values.
     public class PostParameters
     {
         public DateTime MinDate { get; set; } = DateTime.MinValue;

@@ -24,11 +24,7 @@ namespace fakeLook_starter.Services
             var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config["Jwt:Key"]));
             var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
             var claims = new[] {
-            new Claim("UserId", user.Id.ToString()),
-            //new Claim("User", ),
-            //new Claim(ClaimTypes.Role, user.Role),
-            //new Claim(ClaimTypes.NameIdentifier,
-            //Guid.NewGuid().ToString())
+            new Claim("UserId", user.Id.ToString())
         };
             var token = new JwtSecurityToken(_config["Jwt:Issuer"],
               _config["Jwt:Issuer"],
